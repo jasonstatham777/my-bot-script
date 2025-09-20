@@ -3,8 +3,8 @@ const TelegramBot = require('node-telegram-bot-api');
 // --- ВАШИ ДАННЫЕ ---
 // Токен теперь берется из безопасного хранилища на сервере, а не из кода
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const gameShortName = 'bananarun'; // <-- ВАШЕ КОРОТКОЕ ИМЯ ИГРЫ ИЗ ШАГА 2
-const gameUrl = 'https://ВАШ_НИКНЕЙМ.github.io/banana-runner-game/'; // <-- ВАША ССЫЛКА НА ИГРУ ИЗ ШАГА 1
+const gameShortName = 'CherkashGame'; // <-- ВАШЕ КОРОТКОЕ ИМЯ ИГРЫ ИЗ ШАГА 2
+const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/'; // <-- ВАША ССЫЛКА НА ИГРУ ИЗ ШАГА 1
 // --------------------
 
 // Проверка, что токен был предоставлен
@@ -33,3 +33,4 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
 
 console.log(`Бот для игры "${gameShortName}" успешно запущен!`);
+
