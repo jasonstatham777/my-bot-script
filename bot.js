@@ -3,7 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 // --- ВАШИ ДАННЫЕ ---
 // Токен теперь берется из безопасного хранилища на сервере, а не из кода
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const gameShortName = 'CherkashGame'; // <-- ВАШЕ КОРОТКОЕ ИМЯ ИГРЫ ИЗ ШАГА 2
+const gameShortName = 'cherkashidzerun'; // <-- ВАШЕ КОРОТКОЕ ИМЯ ИГРЫ ИЗ ШАГА 2
 const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/'; // <-- ВАША ССЫЛКА НА ИГРУ ИЗ ШАГА 1
 // --------------------
 
@@ -33,4 +33,5 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
 
 console.log(`Бот для игры "${gameShortName}" успешно запущен!`);
+
 
