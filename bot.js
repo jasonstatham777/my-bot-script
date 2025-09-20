@@ -19,8 +19,17 @@ bot.onText(/\/start/, (msg) => {
   bot.sendGame(msg.chat.id, gameShortName);
 });
 
+bot.on('inline_query', (query) => {
+  bot.answerInlineQuery(query.id, [{
+    type: 'game',
+    id: '1', // Просто уникальный ID для этого ответа
+    game_short_name: gameShortName
+  }]);
+});
+
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   bot.answerCallbackQuery(callbackQuery.id, { url: gameUrl });
 });
+
 
 console.log(`Бот для игры "${gameShortName}" успешно запущен!`);
