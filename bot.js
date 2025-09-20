@@ -1,35 +1,30 @@
-const TelegramBot = require('node-telegram-bot-api');
+const { Telegraf } = require('telegraf');
 
-// --- ВАШИ ДАННЫЕ ---
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
     console.error("КРИТИЧЕСКАЯ ОШИБКА: TELEGRAM_BOT_TOKEN не найден в Secrets!");
     process.exit(1);
 }
 
-const gameShortName = 'cherkashidzerun'; // <-- Ваше короткое имя игры
-const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/'; // <-- Ваша ссылка на игру
-// --------------------
+const gameShortName = 'cherkashidzerun';
+const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/';
 
-const bot = new TelegramBot(token, { polling: true });
+const bot = new Telegraf(token);
 
-// --- УНИВЕРСАЛЬНЫЙ ОБРАБОТЧИК КОМАНД ---
-// Этот код теперь ловит ЛЮБОЕ сообщение, которое начинается с /start ИЛИ /game
-bot.onText(/^\/(start|game)/, (msg) => {
-    // msg.chat.id - это ID чата, откуда пришла команда (личного или группового)
-    bot.sendGame(msg.chat.id, gameShortName);
+bot.command(['start', 'game'], (ctx) => {
+    return ctx.replyWithGame(gameShortName);
 });
 
-// Этот обработчик для нажатия на кнопку "Play"
-bot.on('callback_query', function onCallbackQuery(callbackQuery) {
-    bot.answerCallbackQuery(callbackQuery.id, { url: gameUrl });
+bot.on('callback_query', (ctx) => {
+    return ctx.answerCbQuery('', { url: gameUrl });
 });
 
-console.log(`Бот для игры "${gameShortName}" успешно запущен и готов к работе!`);
+bot.launch();
 
-// --- Часть кода, чтобы бот не "засыпал" ---
+console.log(`Бот для игры "${gameShortName}" на Telegraf успешно запущен!`);
+
 const http = require('http');
-http.createServer(function (req, res) {
+http.createServer((req, res) => {
     res.write("I'm alive");
     res.end();
 }).listen(8080);
