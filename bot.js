@@ -1,6 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
 
-// --- ВАШИ ДАННЫЕ ---
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const gameShortName = 'cherkashidzerun'; // <-- Ваше короткое имя
 const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/'; // <-- Ваша ссылка на игру
@@ -8,18 +7,9 @@ const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/'; // <-- �
 
 const bot = new TelegramBot(token, { polling: true });
 
-// Эта функция теперь будет обрабатывать команды /start и /game
-const sendGame = (chatId) => {
-  bot.sendGame(chatId, gameShortName);
-};
-
-// Отвечаем на команды в личных сообщениях и группах
-bot.onText(/\/start/, (msg) => {
-  sendGame(msg.chat.id);
-});
-
-bot.onText(/\/game/, (msg) => {
-  sendGame(msg.chat.id);
+// Этот обработчик теперь ловит ОБЕ команды: /start и /game
+bot.onText(/\/(start|game)/, (msg) => {
+  bot.sendGame(msg.chat.id, gameShortName);
 });
 
 // Этот обработчик для нажатия на кнопку "Play"
