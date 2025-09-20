@@ -1,35 +1,50 @@
 const TelegramBot = require('node-telegram-bot-api');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// --- ВАШИ ДАННЫЕ ---
+// === ДАННЫЕ ===
 const token = process.env.TELEGRAM_BOT_TOKEN;
-if (!token) {
-    console.error("КРИТИЧЕСКАЯ ОШИБКА: TELEGRAM_BOT_TOKEN не найден в Secrets!");
-    process.exit(1);
-}
-
-const gameShortName = 'cherkashidzerun'; // <-- Ваше короткое имя игры
-const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/'; // <-- Ваша ссылка на игру
-// --------------------
+const gameShortName = 'cherkashidzerun';
+const gameUrl = 'https://jasonstatham777.github.io/cherkashidze-game/';
+// ==============
 
 const bot = new TelegramBot(token, { polling: true });
+const app = express();
+app.use(bodyParser.json());
 
-// --- УНИВЕРСАЛЬНЫЙ ОБРАБОТЧИК КОМАНД ---
-// Этот код теперь ловит ЛЮБОЕ сообщение, которое начинается с /start ИЛИ /game
+// В этом объекте будем хранить message_id для каждого чата
+const gameMessages = {};
+
+// Обработка /start и /game
 bot.onText(/^\/(start|game)/, (msg) => {
-    // msg.chat.id - это ID чата, откуда пришла команда (личного или группового)
-    bot.sendGame(msg.chat.id, gameShortName);
+    bot.sendGame(msg.chat.id, gameShortName).then(sent => {
+        // Сохраняем сообщение, чтобы потом обновлять очки
+        gameMessages[msg.chat.id] = sent.message_id;
+    });
 });
 
-// Этот обработчик для нажатия на кнопку "Play"
-bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+// Когда пользователь жмёт "Играть"
+bot.on('callback_query', (callbackQuery) => {
     bot.answerCallbackQuery(callbackQuery.id, { url: gameUrl });
 });
 
-console.log(`Бот для игры "${gameShortName}" успешно запущен и готов к работе!`);
+// === Роут для сохранения очков ===
+app.post('/setscore', (req, res) => {
+    const { user_id, score, chat_id } = req.body;
 
-// --- Часть кода, чтобы бот не "засыпал" ---
-const http = require('http');
-http.createServer(function (req, res) {
-    res.write("I'm alive");
-    res.end();
-}).listen(8080);
+    const messageId = gameMessages[chat_id];
+    if (!messageId) {
+        return res.status(400).send({ ok: false, error: "Message not found" });
+    }
+
+    bot.setGameScore(user_id, score, { chat_id, message_id: messageId, force: true })
+        .then(() => res.send({ ok: true }))
+        .catch(err => {
+            console.error(err);
+            res.status(500).send({ ok: false, error: err.toString() });
+        });
+});
+
+// --- Часть, чтобы Replit не засыпал ---
+app.get('/', (req, res) => res.send("I'm alive"));
+app.listen(8080, () => console.log("Server running on port 8080"));
